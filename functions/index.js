@@ -10,8 +10,8 @@ const checkError = function(error) {
 
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
-    organization: "org-bTK9dZIheZ2DtTRncOdFg1hn",
-    apiKey: "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",
+    organization: "org-ZoKreamHYgnbKIQaEGLNKbK6",
+    apiKey: "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",
 });
 
 const path = require('path');
