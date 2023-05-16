@@ -24,13 +24,13 @@
 
     <script src="https://code.jquery.com/jquery-3.6.3.min.js"
         integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU=" crossorigin="anonymous"></script>
-    <script src="assets/js/firebaseConfig.js"></script>
+    <script src="assets/js/firebaseset.js"></script>
     <!-- 파이어베이스 관련 스크립트 -->
 
     <!-- 파이어베이스 관련 스크립트 -->
     <main class="form-signin w-100 m-auto">
         <form>
-            <a href="index.html">
+            <a href="/">
                 <img class="mb-4" src="assets/image/로고.png" alt="" width="250" height="auto">
             </a>
             <h1 class="h3 mb-3 fw-normal">로그인</h1>
@@ -44,7 +44,7 @@
                 <label for="password">Password</label>
             </div>
             <button class="w-100 btn btn-lg btn-primary mb-2" type="submit" id="signInButton">Sign in</button>
-            <a class="w-100 btn btn-lg btn-outline-secondary" href="회원가입2.html">Sign up</a>
+            <a class="w-100 btn btn-lg btn-outline-secondary" href="/sign-up">Sign up</a>
             <footer class="py-3 my-4">
                 <ul class="nav justify-content-center border-bottom pb-3 mb-3 "></ul>
                 <p class="text-center text-muted">© 2023 KOREATECH, Univ</p>
@@ -78,7 +78,7 @@
                     alert("로그인 성공");
                     console.log(userCredential)
                     var user = userCredential.user;
-                    window.location.href = 'index.html'
+                    window.location.href = '/'
                 })
                 .catch((error) => {
                     console.log('로그인 실패')

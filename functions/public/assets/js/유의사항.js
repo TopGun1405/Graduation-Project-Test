@@ -98,12 +98,14 @@ $("#send").click(function () {
         .doc(user.email.split("@")[0] + " " + "test")
         .set(저장할거)
         .then((result) => {
+          // window.location.href = "모의면접.html";
           window.location.href = "/mock-interview";
           console.log(result);
           // alert("정상동작 하였습니다.");
         })
         .catch((error) => {
           alert("에러가 발생했습니다");
+          // window.location.href = "유의사항.html";
           window.location.href = "/notice";
           console.log(error);
         });
