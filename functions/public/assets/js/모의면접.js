@@ -120,10 +120,18 @@ function fixWrongSpell(orgSentence, tokens, suggestions) {
     tokens.forEach((token, idx) => {
         console.log(token);
         console.log(suggestions[idx].join('/'));
-        changedText = changedText.replace(token, '[' + suggestions[idx].join('/') + ']');
+        changedText = changedText.replace(token, suggestions[idx].join('/'));
     });
     console.log(changedText);
     return changedText;
+}
+
+function createFixArr(tokens, suggestions) {
+    let changedObj = {};
+    tokens.forEach((token, idx) => {
+        changedObj[token] = suggestions[idx].join(" / ");
+    });
+    return changedObj;
 }
 
 
@@ -185,10 +193,12 @@ $('#send').click(function() {
                 console.log(suggestions);
 
                 let fixedSentence = fixWrongSpell(contentVal, tokens, suggestions);
+                let fixArr = JSON.stringify(createFixArr(tokens, suggestions));
 
                 let 저장할거 = {
                     수정전내용: contentVal, 
                     수정후내용: fixedSentence, 
+                    수정할내용: fixArr, 
                     날짜: new Date(), 
                     걸린시간: 0, 
                 }

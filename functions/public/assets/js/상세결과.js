@@ -49,8 +49,28 @@ window.onload = function() {
 
         // 수정 전/후 텍스트 불러오기
         db.collection('teststt').doc(userName + ' '+ i + "번 질문").get().then((result) => {
-            document.getElementById('contents1').value = result.data().수정전내용;
-            document.getElementById('contents2').value = result.data().수정후내용;
+            // document.getElementById('contents1').value = result.data().수정전내용;
+            // document.getElementById('contents2').value = result.data().수정후내용;
+            console.log(result.data().수정전내용);
+            let resultArray = result.data().수정전내용.split(' ');
+            let showChange = JSON.parse(result.data().수정할내용);
+            let objKeys = Object.keys(showChange);
+            let idx = 0;
+            
+            console.log(resultArray);
+            let createSentence = '';
+            for (element of resultArray) {
+                if (element == objKeys[idx]) {
+                    idx += 1;
+                    console.log(element);
+                }
+                else {
+                    createSentence += '<span>' + element + '</span>\n';
+                }
+            }
+            createSentence += '<br>';
+            $('#join_result').html(createSentence);
+            
             duration = result.data().걸린시간;
             document.getElementById("timeCall").textContent = `걸린 시간: ${duration}초`;
         }).catch((error) => {

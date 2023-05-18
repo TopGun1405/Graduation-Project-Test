@@ -1,4 +1,8 @@
 const functions = require("firebase-functions");
+const express = require('express');
+const app = express();
+const path = require('path');
+const filePath = '/public/';
 
 const hanspell = require('hanspell');
 const checkEnd = function() {
@@ -8,19 +12,22 @@ const checkError = function(error) {
     console.error("error occurred: ", error);
 };
 
+const keyword = require("keyword-extractor-korean");
+const extractor = keyword();
+
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
     organization: "org-ZoKreamHYgnbKIQaEGLNKbK6",
     apiKey: "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",
 });
-
-const path = require('path');
-
-const express = require('express');
-const app = express();
-
-const filePath = '/public/';
-
+const openai = new OpenAIApi(configuration);
+const runGPT = async(prompt) => {
+    console.log("running...");
+    const response = await openai.createChatCompletion({
+        model: "gpt-3.5-turbo", 
+        messages: [{ role: "user", content: prompt }],
+    });
+}
 
 app.set('view engine', 'ejs');
 app.engine('ejs', require('ejs').__express);
@@ -78,6 +85,10 @@ app.get('/admin-page2', (req, res) => {
     res.sendFile(path.join(__dirname + filePath + '관리자페이지2.html'));
 });
 
+app.get('/admin-edit-page', (req, res) => {
+    res.sendFile(path.join(__dirname + filePath + '관리자수정페이지.html'));
+});
+
 app.post('/submitForm', (req, res) => {
     const { sentence } = req.body;
     const spellCheck = async function(results) {
@@ -101,7 +112,8 @@ app.post('/submitForm', (req, res) => {
         res.send(JSON.stringify(response));
     };
 
-    hanspell.spellCheckByPNU(sentence, 6000, spellCheck, checkEnd, checkError);
+    hanspell.spellCheckByDAUM(sentence, 6000, spellCheck, checkEnd, checkError);
+    // hanspell.spellCheckByPNU(sentence, 6000, spellCheck, checkEnd, checkError);
 });
 
 
