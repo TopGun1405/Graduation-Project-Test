@@ -56,11 +56,17 @@ window.onload = function() {
             let showChange = JSON.parse(result.data().수정할내용);
             let objKeys = Object.keys(showChange);
             let idx = 0;
-            
+            console.log(showChange);
             console.log(resultArray);
             let createSentence = '';
             for (element of resultArray) {
                 if (element == objKeys[idx]) {
+                    createSentence +=
+                    '<a class="txt_spell txt_spell_high first_line">\n' + 
+                    '<span class="txt_word">' + 
+                    showChange[element] + '</span>\n' +
+                    '<span class="inner_spell">' + 
+                    element + '</span>\n</a>\n';
                     idx += 1;
                     console.log(element);
                 }

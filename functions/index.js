@@ -1,4 +1,6 @@
 const functions = require("firebase-functions");
+const admin = require("firebase-admin");
+admin.initializeApp();
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -18,7 +20,7 @@ const extractor = keyword();
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
     organization: "org-ZoKreamHYgnbKIQaEGLNKbK6",
-    apiKey: "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",
+    apiKey: "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",
 });
 const openai = new OpenAIApi(configuration);
 
@@ -97,31 +99,50 @@ app.post('/submitForm', (req, res) => {
 
         var keywords = extractor(sentence);
         var keyObj = Object.keys(keywords);
+        
+        const runGPT = async(prompt) => {
+            console.log("running...");
+            const responseGPT = await openai.createChatCompletion({
+                model: "gpt-3.5-turbo", 
+                messages: [{ role: "user", content: prompt }],
+            });
+            let moreQuestions = responseGPT.data.choices[0].message.content;
 
-        let prompt = keyObj[0] + "를 키워드로 나올 수 있는 추가 면접 질문을 2개 알려줘.";
+            let response = {
+                tokens: tokens, 
+                suggestions: suggestions, 
+                keyword1: keyObj[0], 
+                moreQuestions: moreQuestions
+            };
 
-        console.log("running...");
-        const responseG = await openai.createChatCompletion({
-            model: "gpt-3.5-turbo", 
-            messages: [{ role: "user", content: prompt }],
-        });
-        let moreQuestions = responseG.data.choices[0].message.content;
-    
-        let response = {
-            tokens: tokens, 
-            suggestions: suggestions,
-            keyword1: keyObj[0], 
-            moreQuestions: moreQuestions
-        };
+            console.log(response);
+            console.log("done");
 
-        console.log(response);
-        console.log("done");
-        res.send(JSON.stringify(response));
+            res.send(JSON.stringify(response));
+        }
+
+        runGPT(keyObj[0] + "를 키워드로 나올 수 있는 추가 면접 질문을 2개 알려줘.")
     };
 
     hanspell.spellCheckByDAUM(sentence, 6000, spellCheck, checkEnd, checkError);
     // hanspell.spellCheckByPNU(sentence, 6000, spellCheck, checkEnd, checkError);
 });
+
+app.post('/getCollections', (req, res) => {
+    var db = admin.firestore();
+    db.listCollections().then(snapshot => {
+        let collectionName = [];
+        snapshot.forEach(snaps => {
+            console.log(snaps["_queryOptions"].collectionId);
+            collectionName.push(snaps["_queryOptions"].collectionId);
+        });
+
+        let response = {
+            names: collectionName
+        }
+        res.send(JSON.stringify(response));
+    });
+})
 
 
 const api = functions.https.onRequest(app);
