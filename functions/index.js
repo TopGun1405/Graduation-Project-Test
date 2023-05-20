@@ -18,16 +18,10 @@ const extractor = keyword();
 const { Configuration, OpenAIApi } = require("openai");
 const configuration = new Configuration({
     organization: "org-ZoKreamHYgnbKIQaEGLNKbK6",
-    apiKey: "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",
+    apiKey: "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",
 });
 const openai = new OpenAIApi(configuration);
-const runGPT = async(prompt) => {
-    console.log("running...");
-    const response = await openai.createChatCompletion({
-        model: "gpt-3.5-turbo", 
-        messages: [{ role: "user", content: prompt }],
-    });
-}
+
 
 app.set('view engine', 'ejs');
 app.engine('ejs', require('ejs').__express);
@@ -101,14 +95,27 @@ app.post('/submitForm', (req, res) => {
             suggestions.push(element.suggestions);
         }
 
-        console.log(tokens);
-        console.log(suggestions);
+        var keywords = extractor(sentence);
+        var keyObj = Object.keys(keywords);
 
+        let prompt = keyObj[0] + "를 키워드로 나올 수 있는 추가 면접 질문을 2개 알려줘.";
+
+        console.log("running...");
+        const responseG = await openai.createChatCompletion({
+            model: "gpt-3.5-turbo", 
+            messages: [{ role: "user", content: prompt }],
+        });
+        let moreQuestions = responseG.data.choices[0].message.content;
+    
         let response = {
             tokens: tokens, 
-            suggestions: suggestions
+            suggestions: suggestions,
+            keyword1: keyObj[0], 
+            moreQuestions: moreQuestions
         };
 
+        console.log(response);
+        console.log("done");
         res.send(JSON.stringify(response));
     };
 
