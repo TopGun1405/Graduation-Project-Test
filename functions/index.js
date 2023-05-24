@@ -1,6 +1,8 @@
 const functions = require("firebase-functions");
+
 const admin = require("firebase-admin");
 admin.initializeApp();
+
 const express = require('express');
 const app = express();
 const path = require('path');
@@ -18,9 +20,10 @@ const keyword = require("keyword-extractor-korean");
 const extractor = keyword();
 
 const { Configuration, OpenAIApi } = require("openai");
+const { organization, apiKey } = require("./public/assets/js/openAIConfig.js");
 const configuration = new Configuration({
-    organization: "org-ZoKreamHYgnbKIQaEGLNKbK6",
-    apiKey: "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",
+    organization: organization,
+    apiKey: apiKey,
 });
 const openai = new OpenAIApi(configuration);
 
@@ -85,6 +88,14 @@ app.get('/admin-edit-page', (req, res) => {
     res.sendFile(path.join(__dirname + filePath + '관리자수정페이지.html'));
 });
 
+app.get('/choiceresults', (req, res) => {
+    res.sendFile(path.join(__dirname + filePath + '상세결과면접선택.html'));
+});
+
+app.get('/admin-ans-edit', (req, res) => {
+    res.sendFile(path.join(__dirname + filePath + '관리자질문유형수정.html'));
+});
+
 app.post('/submitForm', (req, res) => {
     const { sentence } = req.body;
     const spellCheck = async function(results) {
@@ -111,7 +122,7 @@ app.post('/submitForm', (req, res) => {
             let response = {
                 tokens: tokens, 
                 suggestions: suggestions, 
-                keyword1: keyObj[0], 
+                keyword1: (keyObj[0] == undefined ? '' : keyObj[0]), 
                 moreQuestions: moreQuestions
             };
 
@@ -120,8 +131,25 @@ app.post('/submitForm', (req, res) => {
 
             res.send(JSON.stringify(response));
         }
+        try {
+            if (keyObj[0] != undefined)
+                runGPT(keyObj[0] + "을(를) 키워드로 나올 수 있는 추가 면접 질문을 " + keyObj[0] + "을(를) 질문 문장에 포함해서 2개 알려줘.");
+            else
+                runGPT('' + "을(를) 키워드로 나올 수 있는 추가 면접 질문을 " + '' + "을(를) 질문 문장에 포함해서 2개 알려줘.");
+        }
+        catch (error) {
+            console.log("GPT error" + error);
 
-        runGPT(keyObj[0] + "를 키워드로 나올 수 있는 추가 면접 질문을 2개 알려줘.")
+            let response = {
+                tokens: tokens, 
+                suggestions: suggestions, 
+                keyword1: (keyObj[0] == undefined ? '' : keyObj[0]), 
+                moreQuestions: ''
+            };
+
+            console.log(response);
+            res.send(JSON.stringify(response));
+        }
     };
 
     hanspell.spellCheckByDAUM(sentence, 6000, spellCheck, checkEnd, checkError);
@@ -142,7 +170,7 @@ app.post('/getCollections', (req, res) => {
         }
         res.send(JSON.stringify(response));
     });
-})
+});
 
 
 const api = functions.https.onRequest(app);
